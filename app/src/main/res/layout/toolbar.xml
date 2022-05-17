@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/idLLEdt"
+    android:orientation="horizontal"
+
+    android:weightSum="5">
+
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/idEdtCity"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="4.5"
+            android:background="@android:color/transparent"
+            android:hint="Search City"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
+
+        <ImageView
+            android:id="@+id/idTVSearch"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:layout_weight="0.5"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_search"
+            app:tint="@color/white" />
+
+
+</LinearLayout>
