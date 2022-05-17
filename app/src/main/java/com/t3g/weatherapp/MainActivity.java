@@ -17,6 +17,7 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,6 +53,7 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity {
 
     private RelativeLayout homeRL;
+    private ScrollView SVMain;
     private ProgressBar loadingPB;
     private TextView
             cityNameTV,
@@ -60,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
             feelsLikeTV,
             todayTV,
             todayTV3,todayTV4,todayTV5,todayTV6,
-            precipitationTV,
+            humidityTV,
             pressureTV,
             windTV,
             dateTV;
@@ -76,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
             backIV,
             iconIV,
             searchIV,
-            precipitationIV,
+            humidityIV,
             pressureIV,
             windIV;
     private ArrayList<WeatherRVModal>
@@ -96,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
     private int PERMISSION_CODE = 1;
     private String cityName;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,7 +108,8 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_home);
 
-        homeRL = findViewById(R.id.idRLHome);
+//        homeRL = findViewById(R.id.idRLHome);
+        SVMain = findViewById(R.id.SVMain);
         loadingPB = findViewById(R.id.idPBLoading);
         cityNameTV = findViewById(R.id.idTVCityName);
         temperatureTV = findViewById(R.id.idTVTemperature);
@@ -128,8 +132,8 @@ public class MainActivity extends AppCompatActivity {
         searchIV = findViewById(R.id.idTVSearch);
         dateTV = findViewById(R.id.dateTV);
 
-        precipitationTV = findViewById(R.id.precipitationTV);
-        precipitationIV = findViewById(R.id.precipitationIV);
+        humidityTV = findViewById(R.id.humidityTV);
+        humidityIV = findViewById(R.id.humidityIV);
         pressureIV = findViewById(R.id.pressureIV);
         pressureTV = findViewById(R.id.pressureTV);
         windTV = findViewById(R.id.windTV);
@@ -170,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
                 .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         String lat = Double.toString(location.getLatitude());
         String lon = Double.toString(location.getLongitude());
-        getWeatherInfoLatLon(cityName, lat, lon);
+        getWeatherInfoLatLon(lat, lon);
 
 //        Search by City
         searchIV.setOnClickListener(new View.OnClickListener() {
@@ -181,7 +185,9 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Please Enter City Name", Toast.LENGTH_SHORT).show();
                 }else{
                     cityNameTV.setText(city);
-                    getWeatherInfoCity(city, location.getLatitude(), location.getLongitude());
+                    getWeatherInfoCity(city);
+                    loadingPB.setVisibility(View.VISIBLE);
+                    SVMain.setVisibility(View.GONE);
                 }
             }
         });
@@ -203,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 //    Function to retrieve data with latitude & longitude
-    private void getWeatherInfoLatLon(String cityName, String lat, String lon){
+    private void getWeatherInfoLatLon(String lat, String lon){
         String urlForecastFromLatLon = "https://api.openweathermap.org/data/2.5/forecast?" +
                 "lat=" + lat + "&lon=" + lon +
                 "&appid=caf89aee48527f1ef55a54cba7d2e51e&cnt=40" +
@@ -222,9 +228,9 @@ public class MainActivity extends AppCompatActivity {
                 String currentDay = new SimpleDateFormat("dd", Locale.getDefault()).format(new Date());
                 String currentTime = new SimpleDateFormat("HH", Locale.getDefault()).format(new Date());
                 String currentTime1 = new SimpleDateFormat("hh-mm aa", Locale.getDefault()).format(new Date());
-                Toast.makeText(MainActivity.this, currentTime, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MainActivity.this, currentTime, Toast.LENGTH_SHORT).show();
                 loadingPB.setVisibility(View.GONE);
-                homeRL.setVisibility(View.VISIBLE);
+                SVMain.setVisibility(View.VISIBLE);
                 weatherRVModalArrayList.clear();
                 weatherRVModalArrayList2.clear();
                 weatherRVModalArrayList3.clear();
@@ -237,25 +243,32 @@ public class MainActivity extends AppCompatActivity {
                         JSONObject cityJsonObject = response.getJSONObject("city");
                         String city = cityJsonObject.getString("name");
                         cityNameTV.setText(city);
-                        JSONObject main = response.getJSONArray("list").getJSONObject(1).getJSONObject("main");
-                        JSONObject winObject1 = response.getJSONArray("list").getJSONObject(1).getJSONObject("wind");
+                        JSONObject main = list.getJSONObject(1).getJSONObject("main");
+                        JSONObject winObject1 = list.getJSONObject(1).getJSONObject("wind");
+
+                        String pressure = main.getString("pressure");
+                    pressureTV.setText(pressure+" hPa");
+                    String humidity = main.getString("humidity");
+                    humidityTV.setText(humidity);
 
                     JSONObject time1 = list.getJSONObject(1);
                     String dateTime1 = time1.getString("dt_txt");
                     String temp = main.getString("temp");
-                    String windS = winObject1.getString("speed");
-                        temperatureTV.setText(temp);
+                        temperatureTV.setText(temp+"°C");
                     String feels_like = main.getString("feels_like");
-                        feelsLikeTV.setText("Feels like : "+feels_like);
+                        feelsLikeTV.setText("Feels like : "+feels_like+"°C");
+                    String windS = winObject1.getString("speed");
                         windTV.setText(windS+" m/s");
                         dateTV.setText(currentDate + " : "+currentTime1);
 //                    Toast.makeText(MainActivity.this, lat + " : " +lon, Toast.LENGTH_LONG).show();
 
-                        JSONObject weather = response.getJSONArray("list")
-                                .getJSONObject(0).getJSONArray("weather").getJSONObject(0);
+                        JSONObject weather = list
+                                .getJSONObject(1).getJSONArray("weather").getJSONObject(0);
                         String condition = weather.getString("main");
                         String description = weather.getString("description");
-                            conditionTV.setText(condition+" : "+description);
+                        String id = weather.getString("id");
+
+                            conditionTV.setText(" "+condition+" : "+description+" ");
                         String icon = weather.getString("icon");
                         String iconUrl = "https://openweathermap.org/img/wn/"+icon+".png";
                             Picasso
@@ -282,11 +295,12 @@ public class MainActivity extends AppCompatActivity {
                             int outD = Integer.parseInt(outputDate1.format(t));
 
                             if(cd1==outD) {
-                                float jT = Float.parseFloat(outputTime.format(t));
-                                float cT = Float.parseFloat(currentTime);
+                                int jT = Integer.parseInt(outputTime.format(t));
+                                int cT = Integer.parseInt(currentTime);
 
 //                            Later Today
                                 if (jT > cT) {
+//                                    Toast.makeText(MainActivity.this, jT+" - "+cT, Toast.LENGTH_SHORT).show();
                                     todayTV.setVisibility(View.VISIBLE);
                                     JSONObject main1 = list.getJSONObject(i).getJSONObject("main");
                                     String temp1 = main1.getString("temp");
@@ -393,7 +407,7 @@ public class MainActivity extends AppCompatActivity {
         });
         requestQueue.add(jsonObjectRequest);
     }
-    private void getWeatherInfoCity(String cityName, double longitude, double latitude){
+    private void getWeatherInfoCity(String cityName){
 //        String urlForecastFromLatLon = "https://api.openweathermap.org/data/2.5/forecast?" +
 //                "lat=" + lat + "&lon=" + lon +
 //                "&appid=caf89aee48527f1ef55a54cba7d2e51e&cnt=40" +
@@ -411,9 +425,10 @@ public class MainActivity extends AppCompatActivity {
                 String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
                 String currentDay = new SimpleDateFormat("dd", Locale.getDefault()).format(new Date());
                 String currentTime = new SimpleDateFormat("HH", Locale.getDefault()).format(new Date());
+                String currentTime1 = new SimpleDateFormat("hh-mm aa", Locale.getDefault()).format(new Date());
 //                Toast.makeText(MainActivity.this, currentTime, Toast.LENGTH_SHORT).show();
                 loadingPB.setVisibility(View.GONE);
-                homeRL.setVisibility(View.VISIBLE);
+                SVMain.setVisibility(View.VISIBLE);
                 weatherRVModalArrayList.clear();
                 weatherRVModalArrayList2.clear();
                 weatherRVModalArrayList3.clear();
@@ -423,34 +438,39 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     JSONArray list = response.getJSONArray("list");
 //                    for (int i = 0; i < list.length();){
-                    JSONObject cityJsonObject = response.getJSONObject("city");
-                    String city = cityJsonObject.getString("name");
-                    cityNameTV.setText(city);
-                    JSONObject main = response.getJSONArray("list").getJSONObject(1).getJSONObject("main");
-                    JSONObject winObject1 = response.getJSONArray("list").getJSONObject(1).getJSONObject("wind");
+                        JSONObject cityJsonObject = response.getJSONObject("city");
+                        String city = cityJsonObject.getString("name");
+                        cityNameTV.setText(city);
+                        JSONObject main = response.getJSONArray("list").getJSONObject(1).getJSONObject("main");
+                        JSONObject winObject1 = response.getJSONArray("list").getJSONObject(1).getJSONObject("wind");
+
+                        String pressure = main.getString("pressure");
+                    pressureTV.setText(pressure+" hPa");
+                    String humidity = main.getString("humidity");
+                    humidityTV.setText(humidity);
 
                     JSONObject time1 = list.getJSONObject(1);
                     String dateTime1 = time1.getString("dt_txt");
-                    String temp = main.getString("temp");
-                    String windS = winObject1.getString("speed");
-                    temperatureTV.setText(temp);
+                    String temp = main.getString("temp"+"°C");
+                        temperatureTV.setText(temp);
                     String feels_like = main.getString("feels_like");
-                    feelsLikeTV.setText("Feels like : "+feels_like);
-                    windTV.setText(windS+" m/s");
-                    dateTV.setText(currentDate);
+                        feelsLikeTV.setText("Feels like : "+feels_like+"°C");
+                    String windS = winObject1.getString("speed");
+                        windTV.setText(windS+" m/s");
+                        dateTV.setText(currentDate + " : "+currentTime1);
 //                    Toast.makeText(MainActivity.this, lat + " : " +lon, Toast.LENGTH_LONG).show();
 
-                    JSONObject weather = response.getJSONArray("list")
-                            .getJSONObject(0).getJSONArray("weather").getJSONObject(0);
-                    String condition = weather.getString("main");
-                    String description = weather.getString("description");
-                    conditionTV.setText(condition+" : "+description);
-                    String icon = weather.getString("icon");
-                    String iconUrl = "https://openweathermap.org/img/wn/"+icon+".png";
-                    Picasso
-                            .get()
-                            .load(iconUrl)
-                            .into(iconIV);
+                        JSONObject weather = response.getJSONArray("list")
+                                .getJSONObject(1).getJSONArray("weather").getJSONObject(0);
+                        String condition = weather.getString("main");
+                        String description = weather.getString("description");
+                            conditionTV.setText(condition+" : "+description);
+                        String icon = weather.getString("icon");
+                        String iconUrl = "https://openweathermap.org/img/wn/"+icon+".png";
+                            Picasso
+                                    .get()
+                                    .load(iconUrl)
+                                    .into(iconIV);
 
                     for (int i = 1; i < list.length(); i++) {
                         JSONObject time = list.getJSONObject(i);
@@ -462,6 +482,7 @@ public class MainActivity extends AppCompatActivity {
                         try {
                             Date t = input.parse(dateTime);
                             assert t != null;
+                            int cd1 = Integer.parseInt(currentDay);
                             int cd2 = Integer.parseInt(currentDay) + 1;
                             int cd3 = Integer.parseInt(currentDay) + 2;
                             int cd4 = Integer.parseInt(currentDay) + 3;
@@ -469,36 +490,37 @@ public class MainActivity extends AppCompatActivity {
                             int cd6 = Integer.parseInt(currentDay) + 5;
                             int outD = Integer.parseInt(outputDate1.format(t));
 
-                            if(currentDate.equals(outputDate.format(t))) {
+                            if(cd1==outD) {
                                 int jT = Integer.parseInt(outputTime.format(t));
                                 int cT = Integer.parseInt(currentTime);
 
 //                            Later Today
-                                if (jT >= cT) {
+                                if (jT > cT) {
+//                                    Toast.makeText(MainActivity.this, jT+" - "+cT, Toast.LENGTH_SHORT).show();
                                     todayTV.setVisibility(View.VISIBLE);
                                     JSONObject main1 = list.getJSONObject(i).getJSONObject("main");
                                     String temp1 = main1.getString("temp");
                                     JSONObject weather1 = list.getJSONObject(i)
-                                            .getJSONArray("weather").optJSONObject(0);
+                                            .getJSONArray("weather").getJSONObject(0);
                                     String iconCode = weather1.getString("icon");
                                     String iconUrlLoop = "https://openweathermap.org/img/wn/" + iconCode + ".png";
                                     JSONObject windObj = list.getJSONObject(i).getJSONObject("wind");
-                                    String wind = windObj.getString("speed");
+//                                    String wind = windObj.getString("speed");
                                     weatherRVModalArrayList.add(new WeatherRVModal(dateTime, temp1, iconUrlLoop));
                                 }
                             }
 
 //                            Tomorrow
                             if(cd2==outD) { // convert to dd and compare
-                                JSONObject main1 = list.getJSONObject(i).getJSONObject("main");
-                                String temp1 = main1.getString("temp");
-                                JSONObject weather1 = list.getJSONObject(i).getJSONArray("weather").optJSONObject(0);
-                                String iconCode = weather1.getString("icon");
-                                String iconUrlLoop = "https://openweathermap.org/img/wn/" + iconCode + ".png";
-                                JSONObject windObj = list.getJSONObject(i).getJSONObject("wind");
-                                String wind = windObj.getString("speed");
-                                Toast.makeText(MainActivity.this, wind, Toast.LENGTH_SHORT).show();
-                                weatherRVModalArrayList2.add(new WeatherRVModal(dateTime, temp1, iconUrlLoop));
+                                    JSONObject main1 = list.getJSONObject(i).getJSONObject("main");
+                                    String temp1 = main1.getString("temp");
+                                    JSONObject weather1 = list.getJSONObject(i).getJSONArray("weather").optJSONObject(0);
+                                    String iconCode = weather1.getString("icon");
+                                    String iconUrlLoop = "https://openweathermap.org/img/wn/" + iconCode + ".png";
+                                    JSONObject windObj = list.getJSONObject(i).getJSONObject("wind");
+                                    String wind = windObj.getString("speed");
+//                                Toast.makeText(MainActivity.this, wind, Toast.LENGTH_SHORT).show();
+                                    weatherRVModalArrayList2.add(new WeatherRVModal(dateTime, temp1, iconUrlLoop));
                             }
 //                            Day after Tomorrow
                             if(cd3==outD) { // convert to dd and compare
@@ -581,4 +603,193 @@ public class MainActivity extends AppCompatActivity {
         });
         requestQueue.add(jsonObjectRequest);
     }
+//    private void getWeatherInfoCity(String cityName, double longitude, double latitude){
+////        String urlForecastFromLatLon = "https://api.openweathermap.org/data/2.5/forecast?" +
+////                "lat=" + lat + "&lon=" + lon +
+////                "&appid=caf89aee48527f1ef55a54cba7d2e51e&cnt=40" +
+////                "&units=metric";
+//        String urlFromCityName = "https://api.openweathermap.org/data/2.5/forecast?q=" +
+//                cityName +
+//                "&appid=caf89aee48527f1ef55a54cba7d2e51e&cnt=2" +
+//                "&units=metric";
+//        RequestQueue requestQueue = Volley.newRequestQueue(MainActivity.this);
+//        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+//                Request.Method.GET, urlFromCityName, null, new Response.Listener<JSONObject>() {
+//            @SuppressLint("NotifyDataSetChanged")
+//            @Override
+//            public void onResponse(JSONObject response) {
+//                String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
+//                String currentDay = new SimpleDateFormat("dd", Locale.getDefault()).format(new Date());
+//                String currentTime = new SimpleDateFormat("HH", Locale.getDefault()).format(new Date());
+////                Toast.makeText(MainActivity.this, currentTime, Toast.LENGTH_SHORT).show();
+//                loadingPB.setVisibility(View.GONE);
+//                SVMain.setVisibility(View.VISIBLE);
+//                weatherRVModalArrayList.clear();
+//                weatherRVModalArrayList2.clear();
+//                weatherRVModalArrayList3.clear();
+//                weatherRVModalArrayList4.clear();
+//                weatherRVModalArrayList5.clear();
+//                weatherRVModalArrayList6.clear();
+//                try {
+//                    JSONArray list = response.getJSONArray("list");
+////                    for (int i = 0; i < list.length();){
+//                    JSONObject cityJsonObject = response.getJSONObject("city");
+//                    String city = cityJsonObject.getString("name");
+//                    cityNameTV.setText(city);
+//
+//                    JSONObject main = response.getJSONArray("list").getJSONObject(1).getJSONObject("main");
+//                    JSONObject winObject1 = response.getJSONArray("list").getJSONObject(1).getJSONObject("wind");
+//
+//                    JSONObject time1 = list.getJSONObject(1);
+//                    String dateTime1 = time1.getString("dt_txt");
+//                    String temp = main.getString("temp");
+//                    String windS = winObject1.getString("speed");
+//                    temperatureTV.setText(temp);
+//                    String feels_like = main.getString("feels_like");
+//                    feelsLikeTV.setText("Feels like : "+feels_like);
+//                    windTV.setText(windS+" m/s");
+//                    dateTV.setText(currentDate);
+////                    Toast.makeText(MainActivity.this, lat + " : " +lon, Toast.LENGTH_LONG).show();
+//
+//                    JSONObject weather = response.getJSONArray("list")
+//                            .getJSONObject(1).getJSONArray("weather").getJSONObject(0);
+//                    String condition = weather.getString("main");
+//                    String description = weather.getString("description");
+//                    conditionTV.setText(condition+" : "+description);
+//                    String icon = weather.getString("icon");
+//                    String iconUrl = "https://openweathermap.org/img/wn/"+icon+".png";
+//                    Picasso
+//                            .get()
+//                            .load(iconUrl)
+//                            .into(iconIV);
+//
+//                    for (int i = 1; i < list.length(); i++) {
+//                        JSONObject time = list.getJSONObject(i);
+//                        String dateTime = time.getString("dt_txt");
+//                        SimpleDateFormat input = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+//                        SimpleDateFormat outputDate = new SimpleDateFormat("dd-MM-yyyy");
+//                        SimpleDateFormat outputDate1 = new SimpleDateFormat("dd");
+//                        SimpleDateFormat outputTime = new SimpleDateFormat("HH");
+//                        try {
+//                            Date t = input.parse(dateTime);
+//                            assert t != null;
+//                            int cd2 = Integer.parseInt(currentDay) + 1;
+//                            int cd3 = Integer.parseInt(currentDay) + 2;
+//                            int cd4 = Integer.parseInt(currentDay) + 3;
+//                            int cd5 = Integer.parseInt(currentDay) + 4;
+//                            int cd6 = Integer.parseInt(currentDay) + 5;
+//                            int outD = Integer.parseInt(outputDate1.format(t));
+//
+//                            if(currentDate.equals(outputDate.format(t))) {
+//                                int jT = Integer.parseInt(outputTime.format(t));
+//                                int cT = Integer.parseInt(currentTime);
+//
+////                            Later Today
+//                                if (jT >= cT) {
+//                                    todayTV.setVisibility(View.VISIBLE);
+//                                    JSONObject main1 = list.getJSONObject(i).getJSONObject("main");
+//                                    String temp1 = main1.getString("temp");
+//                                    JSONObject weather1 = list.getJSONObject(i)
+//                                            .getJSONArray("weather").optJSONObject(0);
+//                                    String iconCode = weather1.getString("icon");
+//                                    String iconUrlLoop = "https://openweathermap.org/img/wn/" + iconCode + ".png";
+//                                    JSONObject windObj = list.getJSONObject(i).getJSONObject("wind");
+//                                    String wind = windObj.getString("speed");
+//                                    weatherRVModalArrayList.add(new WeatherRVModal(dateTime, temp1, iconUrlLoop));
+//                                }
+//                            }
+//
+////                            Tomorrow
+//                            if(cd2==outD) { // convert to dd and compare
+//                                JSONObject main1 = list.getJSONObject(i).getJSONObject("main");
+//                                String temp1 = main1.getString("temp");
+//                                JSONObject weather1 = list.getJSONObject(i).getJSONArray("weather").optJSONObject(0);
+//                                String iconCode = weather1.getString("icon");
+//                                String iconUrlLoop = "https://openweathermap.org/img/wn/" + iconCode + ".png";
+//                                JSONObject windObj = list.getJSONObject(i).getJSONObject("wind");
+//                                String wind = windObj.getString("speed");
+//                                Toast.makeText(MainActivity.this, wind, Toast.LENGTH_SHORT).show();
+//                                weatherRVModalArrayList2.add(new WeatherRVModal(dateTime, temp1, iconUrlLoop));
+//                            }
+////                            Day after Tomorrow
+//                            if(cd3==outD) { // convert to dd and compare
+//                                todayTV3.setVisibility(View.VISIBLE);
+//                                todayTV3.setText(outputDate.format(t));
+//                                JSONObject main1 = list.getJSONObject(i).getJSONObject("main");
+//                                String temp1 = main1.getString("temp");
+//                                JSONObject weather1 = list.getJSONObject(i).getJSONArray("weather").optJSONObject(0);
+//                                String iconCode = weather1.getString("icon");
+//                                String iconUrlLoop = "https://openweathermap.org/img/wn/" + iconCode + ".png";
+//                                JSONObject windObj = list.getJSONObject(i).getJSONObject("wind");
+//                                String wind = windObj.getString("speed");
+//                                weatherRVModalArrayList3.add(new WeatherRVModal(dateTime, temp1, iconUrlLoop));
+//                            }
+//
+////                            Day after Tomorrow + 1
+//                            if(cd4==outD) { // convert to dd and compare
+//                                todayTV4.setVisibility(View.VISIBLE);
+//                                todayTV4.setText(outputDate.format(t));
+//                                JSONObject main1 = list.getJSONObject(i).getJSONObject("main");
+//                                String temp1 = main1.getString("temp");
+//                                JSONObject weather1 = list.getJSONObject(i).getJSONArray("weather")
+//                                        .getJSONObject(0);
+//                                String iconCode = weather1.getString("icon");
+//                                String iconUrlLoop = "https://openweathermap.org/img/wn/" + iconCode + ".png";
+//                                JSONObject windObj = list.getJSONObject(i).getJSONObject("wind");
+//                                String wind = windObj.getString("speed");
+//                                weatherRVModalArrayList4.add(new WeatherRVModal(dateTime, temp1, iconUrlLoop));
+//                            }
+//
+////                            Day after Tomorrow + 2
+//                            if(cd5==outD) { // convert to dd and compare
+//                                todayTV5.setVisibility(View.VISIBLE);
+//                                todayTV5.setText(outputDate.format(t));
+//                                JSONObject main1 = list.getJSONObject(i).getJSONObject("main");
+//                                String temp1 = main1.getString("temp");
+//                                JSONObject weather1 = list.getJSONObject(i).getJSONArray("weather").optJSONObject(0);
+//                                String iconCode = weather1.getString("icon");
+//                                String iconUrlLoop = "https://openweathermap.org/img/wn/" + iconCode + ".png";
+//                                JSONObject windObj = list.getJSONObject(i).getJSONObject("wind");
+//                                String wind = windObj.getString("speed");
+//                                weatherRVModalArrayList5.add(new WeatherRVModal(dateTime, temp1, iconUrlLoop));
+//                            }
+//
+////                            Day after Tomorrow + 3
+//                            if(cd6==outD) { // convert to dd and compare
+//                                todayTV6.setVisibility(View.VISIBLE);
+//                                todayTV6.setText(outputDate.format(t));
+//                                JSONObject main1 = list.getJSONObject(i).getJSONObject("main");
+//                                String temp1 = main1.getString("temp");
+//                                JSONObject weather1 = list.getJSONObject(i).getJSONArray("weather").optJSONObject(0);
+//                                String iconCode = weather1.getString("icon");
+//                                String iconUrlLoop = "https://openweathermap.org/img/wn/" + iconCode + ".png";
+//                                JSONObject windObj = list.getJSONObject(i).getJSONObject("wind");
+//                                String wind = windObj.getString("speed");
+//                                weatherRVModalArrayList6.add(new WeatherRVModal(dateTime, temp1, iconUrlLoop));
+//                            }
+//
+//                        } catch (ParseException e){
+//                            e.printStackTrace();
+//                        }
+//                    }
+//
+//                    weatherRVAdapter.notifyDataSetChanged();
+//                    weatherRVAdapter2.notifyDataSetChanged();
+//                    weatherRVAdapter3.notifyDataSetChanged();
+//                    weatherRVAdapter4.notifyDataSetChanged();
+//                    weatherRVAdapter5.notifyDataSetChanged();
+//                    weatherRVAdapter6.notifyDataSetChanged();
+//
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                Toast.makeText(MainActivity.this, "Please enter valid city name", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//        requestQueue.add(jsonObjectRequest);
+//    }
 }
