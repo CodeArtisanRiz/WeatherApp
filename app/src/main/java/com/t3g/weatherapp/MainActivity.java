@@ -43,6 +43,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -78,9 +79,7 @@ public class MainActivity extends AppCompatActivity {
             backIV,
             iconIV,
             searchIV,
-            humidityIV,
-            pressureIV,
-            windIV;
+            representationIV;
     private ArrayList<WeatherRVModal>
             weatherRVModalArrayList,
             weatherRVModalArrayList2,
@@ -133,11 +132,10 @@ public class MainActivity extends AppCompatActivity {
         dateTV = findViewById(R.id.dateTV);
 
         humidityTV = findViewById(R.id.humidityTV);
-        humidityIV = findViewById(R.id.humidityIV);
-        pressureIV = findViewById(R.id.pressureIV);
+        representationIV = findViewById(R.id.representationIV);
         pressureTV = findViewById(R.id.pressureTV);
         windTV = findViewById(R.id.windTV);
-        windIV = findViewById(R.id.windIV);
+//        windIV = findViewById(R.id.windIV);
 
         weatherRVModalArrayList = new ArrayList<>();
         weatherRVModalArrayList2 = new ArrayList<>();
@@ -214,10 +212,6 @@ public class MainActivity extends AppCompatActivity {
                 "lat=" + lat + "&lon=" + lon +
                 "&appid=caf89aee48527f1ef55a54cba7d2e51e&cnt=40" +
                 "&units=metric";
-        String urlFromCityName = "https://api.openweathermap.org/data/2.5/forecast?q=" +
-                cityName +
-                "&appid=caf89aee48527f1ef55a54cba7d2e51e&cnt=2" +
-                "&units=metric";
         RequestQueue requestQueue = Volley.newRequestQueue(MainActivity.this);
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Request.Method.GET, urlForecastFromLatLon, null, new Response.Listener<JSONObject>() {
@@ -227,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
                 String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
                 String currentDay = new SimpleDateFormat("dd", Locale.getDefault()).format(new Date());
                 String currentTime = new SimpleDateFormat("HH", Locale.getDefault()).format(new Date());
-                String currentTime1 = new SimpleDateFormat("hh-mm aa", Locale.getDefault()).format(new Date());
+                String currentTime1 = new SimpleDateFormat("hh:mm aa", Locale.getDefault()).format(new Date());
 //                Toast.makeText(MainActivity.this, currentTime, Toast.LENGTH_SHORT).show();
                 loadingPB.setVisibility(View.GONE);
                 SVMain.setVisibility(View.VISIBLE);
@@ -249,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
                         String pressure = main.getString("pressure");
                     pressureTV.setText(pressure+" hPa");
                     String humidity = main.getString("humidity");
-                    humidityTV.setText(humidity);
+                    humidityTV.setText(humidity+"%");
 
                     JSONObject time1 = list.getJSONObject(1);
                     String dateTime1 = time1.getString("dt_txt");
@@ -258,7 +252,39 @@ public class MainActivity extends AppCompatActivity {
                     String feels_like = main.getString("feels_like");
                         feelsLikeTV.setText("Feels like : "+feels_like+"°C");
                     String windS = winObject1.getString("speed");
-                        windTV.setText(windS+" m/s");
+                    String windD = winObject1.getString("deg");
+                    float windDegVal = Float.parseFloat(windD);
+                    String windDirection;
+//                    Array[] compassSector[] = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
+//                            "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW", "N"];
+                    if (windDegVal >337.5) {
+                        windDirection = "N";
+                    }
+                    if (windDegVal>292.5){
+                        windDirection = "NW";
+                    }
+                    if(windDegVal>247.5){
+                        windDirection = "W";
+                    }
+                    else if(windDegVal>202.5){
+                        windDirection = "SW";
+                    }
+                    else if(windDegVal>157.5){
+                        windDirection = "S";
+                    }
+                    else if(windDegVal>122.5){
+                        windDirection = "SE";
+                    }
+                    else if(windDegVal>67.5){
+                        windDirection = "E";
+                    }
+                    else if(windDegVal>22.5){
+                        windDirection = "NE";
+                    }
+                    else {
+                            windDirection = "N";
+                    }
+                        windTV.setText(windS+"m/s "+windDirection);
                         dateTV.setText(currentDate + " : "+currentTime1);
 //                    Toast.makeText(MainActivity.this, lat + " : " +lon, Toast.LENGTH_LONG).show();
 
@@ -270,11 +296,13 @@ public class MainActivity extends AppCompatActivity {
 
                             conditionTV.setText(" "+condition+" : "+description+" ");
                         String icon = weather.getString("icon");
-                        String iconUrl = "https://openweathermap.org/img/wn/"+icon+".png";
+                        String iconUrl = "https://openweathermap.org/img/wn/"+icon+"@4x.png";
                             Picasso
                                     .get()
                                     .load(iconUrl)
                                     .into(iconIV);
+//              Call weatherCondition function with parameters condition & description
+                    weatherCondition(condition,description);
 
                     for (int i = 1; i < list.length(); i++) {
                         JSONObject time = list.getJSONObject(i);
@@ -408,10 +436,6 @@ public class MainActivity extends AppCompatActivity {
         requestQueue.add(jsonObjectRequest);
     }
     private void getWeatherInfoCity(String cityName){
-//        String urlForecastFromLatLon = "https://api.openweathermap.org/data/2.5/forecast?" +
-//                "lat=" + lat + "&lon=" + lon +
-//                "&appid=caf89aee48527f1ef55a54cba7d2e51e&cnt=40" +
-//                "&units=metric";
         String urlFromCityName = "https://api.openweathermap.org/data/2.5/forecast?q=" +
                 cityName +
                 "&appid=caf89aee48527f1ef55a54cba7d2e51e&cnt=2" +
@@ -425,7 +449,7 @@ public class MainActivity extends AppCompatActivity {
                 String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
                 String currentDay = new SimpleDateFormat("dd", Locale.getDefault()).format(new Date());
                 String currentTime = new SimpleDateFormat("HH", Locale.getDefault()).format(new Date());
-                String currentTime1 = new SimpleDateFormat("hh-mm aa", Locale.getDefault()).format(new Date());
+                String currentTime1 = new SimpleDateFormat("hh:mm aa", Locale.getDefault()).format(new Date());
 //                Toast.makeText(MainActivity.this, currentTime, Toast.LENGTH_SHORT).show();
                 loadingPB.setVisibility(View.GONE);
                 SVMain.setVisibility(View.VISIBLE);
@@ -456,7 +480,39 @@ public class MainActivity extends AppCompatActivity {
                     String feels_like = main.getString("feels_like");
                         feelsLikeTV.setText("Feels like : "+feels_like+"°C");
                     String windS = winObject1.getString("speed");
-                        windTV.setText(windS+" m/s");
+                    String windD = winObject1.getString("deg");
+                    float windDegVal = Float.parseFloat(windD);
+                    String windDirection;
+//                    Array[] compassSector[] = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
+//                            "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW", "N"];
+                    if (windDegVal >337.5) {
+                        windDirection = "N";
+                    }
+                    if (windDegVal>292.5){
+                        windDirection = "NW";
+                    }
+                    if(windDegVal>247.5){
+                        windDirection = "W";
+                    }
+                    else if(windDegVal>202.5){
+                        windDirection = "SW";
+                    }
+                    else if(windDegVal>157.5){
+                        windDirection = "S";
+                    }
+                    else if(windDegVal>122.5){
+                        windDirection = "SE";
+                    }
+                    else if(windDegVal>67.5){
+                        windDirection = "E";
+                    }
+                    else if(windDegVal>22.5){
+                        windDirection = "NE";
+                    }
+                    else {
+                        windDirection = "N";
+                    }
+                    windTV.setText(windS+" m/s "+windDirection);
                         dateTV.setText(currentDate + " : "+currentTime1);
 //                    Toast.makeText(MainActivity.this, lat + " : " +lon, Toast.LENGTH_LONG).show();
 
@@ -792,4 +848,35 @@ public class MainActivity extends AppCompatActivity {
 //        });
 //        requestQueue.add(jsonObjectRequest);
 //    }
+    private void weatherCondition(String condition, String description){
+        if(condition.equals("Thunderstorm")){
+            representationIV
+                    .setImageResource(R.drawable.thunderstorm);
+        }else if (condition.equals("Drizzle")){
+            representationIV
+                    .setImageResource(R.drawable.rain);
+        } else if (condition.equals("Rain")){
+            representationIV
+                        .setImageResource(R.drawable.rain);
+        } else if (condition.equals("Snow")){
+            representationIV
+                    .setImageResource(R.drawable.snow);
+        } else if (condition.equals("Mist")){
+        } else if (condition.equals("Smoke")){
+        } else if (condition.equals("Haze")){
+        } else if (condition.equals("Dust")){
+        } else if (condition.equals("Fog")){
+        } else if (condition.equals("Sand")){
+        } else if (condition.equals("Ash")){
+        } else if (condition.equals("Squall")){
+        } else if (condition.equals("Tornado")){
+
+        } else if (condition.equals("Clear")){
+        } else if (condition.equals("Clouds")){
+            representationIV
+                    .setImageResource(R.drawable.cloud);
+        } else {
+
+        }
+    }
 }
