@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
             temperatureTV,
             conditionTV,
             feelsLikeTV,
-            todayTV,
+            todayTV, tomTV,
             todayTV3,todayTV4,todayTV5,todayTV6,
             humidityTV,
             pressureTV,
@@ -300,6 +300,7 @@ public class MainActivity extends AppCompatActivity {
                                 if (jT > cT) {
 //                                    Toast.makeText(MainActivity.this, jT+" - "+cT, Toast.LENGTH_SHORT).show();
                                     todayTV.setVisibility(View.VISIBLE);
+                                    weatherRV.setVisibility(View.VISIBLE);
                                     JSONObject main1 = list.getJSONObject(i).getJSONObject("main");
                                     String temp1 = main1.getString("temp");
                                     JSONObject weather1 = list.getJSONObject(i)
@@ -314,6 +315,8 @@ public class MainActivity extends AppCompatActivity {
 
 //                            Tomorrow
                             if(cd2==outD) { // convert to dd and compare
+                                tomTV.setVisibility(View.VISIBLE);
+                                weatherRV2.setVisibility(View.VISIBLE);
                                     JSONObject main1 = list.getJSONObject(i).getJSONObject("main");
                                     String temp1 = main1.getString("temp");
                                     JSONObject weather1 = list.getJSONObject(i).getJSONArray("weather").optJSONObject(0);
@@ -325,6 +328,7 @@ public class MainActivity extends AppCompatActivity {
 //                            Day after Tomorrow
                             if(cd3==outD) { // convert to dd and compare
                                 todayTV3.setVisibility(View.VISIBLE);
+                                weatherRV3.setVisibility(View.VISIBLE);
                                 todayTV3.setText(outputDate.format(t));
                                 JSONObject main1 = list.getJSONObject(i).getJSONObject("main");
                                 String temp1 = main1.getString("temp");
@@ -338,6 +342,7 @@ public class MainActivity extends AppCompatActivity {
 //                            Day after Tomorrow + 1
                             if(cd4==outD) { // convert to dd and compare
                                 todayTV4.setVisibility(View.VISIBLE);
+                                weatherRV4.setVisibility(View.VISIBLE);
                                 todayTV4.setText(outputDate.format(t));
                                 JSONObject main1 = list.getJSONObject(i).getJSONObject("main");
                                 String temp1 = main1.getString("temp");
@@ -353,6 +358,7 @@ public class MainActivity extends AppCompatActivity {
 //                            Day after Tomorrow + 2
                             if(cd5==outD) { // convert to dd and compare
                                 todayTV5.setVisibility(View.VISIBLE);
+                                weatherRV5.setVisibility(View.VISIBLE);
                                 todayTV5.setText(outputDate.format(t));
                                 JSONObject main1 = list.getJSONObject(i).getJSONObject("main");
                                 String temp1 = main1.getString("temp");
@@ -367,6 +373,7 @@ public class MainActivity extends AppCompatActivity {
 //                            Day after Tomorrow + 3
                             if(cd6==outD) { // convert to dd and compare
                                 todayTV6.setVisibility(View.VISIBLE);
+                                weatherRV6.setVisibility(View.VISIBLE);
                                 todayTV6.setText(outputDate.format(t));
                                 JSONObject main1 = list.getJSONObject(i).getJSONObject("main");
                                 String temp1 = main1.getString("temp");
@@ -470,10 +477,15 @@ public class MainActivity extends AppCompatActivity {
 
         iconIV = findViewById(R.id.idIVIcon);
         todayTV = findViewById(R.id.todayTV);
+        tomTV = findViewById(R.id.tomTV);
         todayTV3 = findViewById(R.id.todayTV3);
         todayTV4 = findViewById(R.id.todayTV4);
         todayTV5 = findViewById(R.id.todayTV5);
         todayTV6 = findViewById(R.id.todayTV6);
+
+
+
+
         dateTV = findViewById(R.id.dateTV);
 
         humidityTV = findViewById(R.id.humidityTV);
