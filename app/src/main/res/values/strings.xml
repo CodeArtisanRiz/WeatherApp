@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">WeatherApp</string>
+    <string name="todo">TODO</string>
+    <string name="weatherApp">WeatherApp</string>
+    <string name="search_city_weather">Search City Weather</string>
+    <string name="today">Today</string>
+    <string name="date">Date</string>
+    <string name="city_name">City Name</string>
+    <string name="_24_c">24°C</string>
+    <string name="feels_like">feels like</string>
+    <string name="condition">Condition</string>
+    <string name="_20">20</string>
+    <string name="_20_m_s">20 m/s</string>
+    <string name="later_today">Later Today:</string>
+    <string name="tomorrow">Tomorrow:</string>
+    <string name="todayTV4">todayTV4</string>
+    <string name="todayTV5">todayTV5</string>
+    <string name="todayTV6">todayTV6</string>
+    <string name="todayTV3">todayTV3</string>
 </resources>
