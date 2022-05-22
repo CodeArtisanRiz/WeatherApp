@@ -129,6 +129,8 @@ public class MainActivity extends AppCompatActivity {
         searchCity();
     }
 
+
+
     @Override
     public void onRequestPermissionsResult(
             int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -484,7 +486,7 @@ public class MainActivity extends AppCompatActivity {
                         cityNameTV.setText(city);
                         String urlForecastByCityName = "https://api.openweathermap.org/data/2.5/forecast?q="
                                 + city +
-                                "&appid=caf89aee48527f1ef55a54cba7d2e51e&cnt=2" +
+                                "&appid=caf89aee48527f1ef55a54cba7d2e51e&cnt=40" +
                                 "&units=metric";
                         getWeather(urlForecastByCityName);
                         splashCL.setVisibility(View.VISIBLE);
