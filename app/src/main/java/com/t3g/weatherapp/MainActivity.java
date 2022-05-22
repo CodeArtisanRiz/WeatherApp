@@ -17,14 +17,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -100,18 +97,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-
         setContentView(R.layout.activity_main);
 
         resourceLinking();
         adaptersInitLink();
 
-
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
         if(ActivityCompat.checkSelfPermission(
                 this,Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(
@@ -131,37 +122,12 @@ public class MainActivity extends AppCompatActivity {
                 "lat=" + lat + "&lon=" + lon +
                 "&appid=caf89aee48527f1ef55a54cba7d2e51e&cnt=40" +
                 "&units=metric";
+//        Search by Latitude & longitude
         getWeather(urlForecastFromLatLon);
 
 //        Search by City
-        cityEdt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    String city = Objects.requireNonNull(cityEdt.getText()).toString();
-                    if(city.isEmpty()){
-                        Toast.makeText(MainActivity.this, "Please Enter City Name", Toast.LENGTH_SHORT).show();
-                    }else{
-                        cityNameTV.setText(city);
-                        String urlForecastByCityName = "https://api.openweathermap.org/data/2.5/forecast?q="
-                                + city +
-                                "&appid=caf89aee48527f1ef55a54cba7d2e51e&cnt=2" +
-                                "&units=metric";
-                        getWeather(urlForecastByCityName);
-                        splashCL.setVisibility(View.VISIBLE);
-                        SVMain.setVisibility(View.GONE);
-                    }
-                    return true;
-                }
-                return false;
-            }
-        });
-
-
+        searchCity();
     }
-
-
-
 
     @Override
     public void onRequestPermissionsResult(
@@ -205,17 +171,17 @@ public class MainActivity extends AppCompatActivity {
                     cityNameTV.setText(city);
                         JSONObject main = list.getJSONObject(1).getJSONObject("main");
                         JSONObject winObject1 = list.getJSONObject(1).getJSONObject("wind");
-                        String pressure = main.getString("pressure");
-                    pressureTV.setText(pressure+" hPa");
-                        String humidity = main.getString("humidity");
-                    humidityTV.setText(humidity+"%");
+                        String pressure = main.getString("pressure") +" hPa";
+                    pressureTV.setText(pressure);
+                        String humidity = main.getString("humidity")+"%";
+                    humidityTV.setText(humidity);
 
                     JSONObject time1 = list.getJSONObject(1);
                         String dateTime1 = time1.getString("dt_txt");
-                        String temp = main.getString("temp");
-                    temperatureTV.setText(temp+"°C");
-                        String feels_like = main.getString("feels_like");
-                    feelsLikeTV.setText("Feels like : "+feels_like+"°C");
+                        String temp = main.getString("temp")+"°C";
+                    temperatureTV.setText(temp);
+                        String feels_like = "Feels like : "+ main.getString("feels_like") +"°C";
+                    feelsLikeTV.setText(feels_like);
                     String dayOfWeek = "Today: "+
                             (LocalDate.now().getDayOfWeek().name().toLowerCase())
                             .substring(0,1).toUpperCase() +
@@ -255,15 +221,17 @@ public class MainActivity extends AppCompatActivity {
                     else {
                             windDirection = "N";
                     }
-                        windTV.setText(windS+"m/s "+windDirection);
-                        dateTV.setText(currentDate + " : "+currentTime1);
+                    String windSpeedDirection = windS +"m/s "+ windDirection;
+                        windTV.setText(windSpeedDirection);
+                    String date_Time = currentDate + " : "+currentTime1;
+                        dateTV.setText(date_Time);
 
                         JSONObject weather = list
                                 .getJSONObject(1).getJSONArray("weather").getJSONObject(0);
                         String condition = weather.getString("main");
                         String description = weather.getString("description");
-//                        String id = weather.getString("id");
-                            conditionTV.setText(" "+condition+" : "+description+" ");
+                        String conditionDescription = " "+condition+" : "+description+" ";
+                            conditionTV.setText(conditionDescription);
 //              Call weatherCondition function with parameters condition & description
                     weatherCondition(condition,description);
                         String icon = weather.getString("icon");
@@ -277,9 +245,13 @@ public class MainActivity extends AppCompatActivity {
                     for (int i = 1; i < list.length(); i++) {
                         JSONObject time = list.getJSONObject(i);
                         String dateTime = time.getString("dt_txt");
+                    @SuppressLint("SimpleDateFormat")
                         SimpleDateFormat input = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+                    @SuppressLint("SimpleDateFormat")
                         SimpleDateFormat outputDate = new SimpleDateFormat("dd-MM-yyyy");
+                    @SuppressLint("SimpleDateFormat")
                         SimpleDateFormat outputDate1 = new SimpleDateFormat("dd");
+                    @SuppressLint("SimpleDateFormat")
                         SimpleDateFormat outputTime = new SimpleDateFormat("HH");
                         try {
                             Date t = input.parse(dateTime);
@@ -307,8 +279,6 @@ public class MainActivity extends AppCompatActivity {
                                             .getJSONArray("weather").getJSONObject(0);
                                     String iconCode = weather1.getString("icon");
                                     String iconUrlLoop = "https://openweathermap.org/img/wn/" + iconCode + ".png";
-                                    JSONObject windObj = list.getJSONObject(i).getJSONObject("wind");
-//                                    String wind = windObj.getString("speed");
                                     weatherRVModalArrayList.add(new WeatherRVModal(dateTime, temp1, iconUrlLoop));
                                 }
                             }
@@ -322,7 +292,6 @@ public class MainActivity extends AppCompatActivity {
                                     JSONObject weather1 = list.getJSONObject(i).getJSONArray("weather").optJSONObject(0);
                                     String iconCode = weather1.getString("icon");
                                     String iconUrlLoop = "https://openweathermap.org/img/wn/" + iconCode + ".png";
-                                    JSONObject windObj = list.getJSONObject(i).getJSONObject("wind");
                                     weatherRVModalArrayList2.add(new WeatherRVModal(dateTime, temp1, iconUrlLoop));
                             }
 //                            Day after Tomorrow
@@ -335,7 +304,6 @@ public class MainActivity extends AppCompatActivity {
                                 JSONObject weather1 = list.getJSONObject(i).getJSONArray("weather").optJSONObject(0);
                                 String iconCode = weather1.getString("icon");
                                 String iconUrlLoop = "https://openweathermap.org/img/wn/" + iconCode + ".png";
-                                JSONObject windObj = list.getJSONObject(i).getJSONObject("wind");
                                 weatherRVModalArrayList3.add(new WeatherRVModal(dateTime, temp1, iconUrlLoop));
                             }
 
@@ -350,8 +318,6 @@ public class MainActivity extends AppCompatActivity {
                                         .getJSONObject(0);
                                 String iconCode = weather1.getString("icon");
                                 String iconUrlLoop = "https://openweathermap.org/img/wn/" + iconCode + ".png";
-                                JSONObject windObj = list.getJSONObject(i).getJSONObject("wind");
-                                String wind = windObj.getString("speed");
                                 weatherRVModalArrayList4.add(new WeatherRVModal(dateTime, temp1, iconUrlLoop));
                             }
 
@@ -365,8 +331,6 @@ public class MainActivity extends AppCompatActivity {
                                 JSONObject weather1 = list.getJSONObject(i).getJSONArray("weather").optJSONObject(0);
                                 String iconCode = weather1.getString("icon");
                                 String iconUrlLoop = "https://openweathermap.org/img/wn/" + iconCode + ".png";
-                                JSONObject windObj = list.getJSONObject(i).getJSONObject("wind");
-                                String wind = windObj.getString("speed");
                                 weatherRVModalArrayList5.add(new WeatherRVModal(dateTime, temp1, iconUrlLoop));
                             }
 
@@ -380,8 +344,6 @@ public class MainActivity extends AppCompatActivity {
                                 JSONObject weather1 = list.getJSONObject(i).getJSONArray("weather").optJSONObject(0);
                                 String iconCode = weather1.getString("icon");
                                 String iconUrlLoop = "https://openweathermap.org/img/wn/" + iconCode + ".png";
-                                JSONObject windObj = list.getJSONObject(i).getJSONObject("wind");
-                                String wind = windObj.getString("speed");
                                 weatherRVModalArrayList6.add(new WeatherRVModal(dateTime, temp1, iconUrlLoop));
                             }
 
@@ -427,23 +389,25 @@ public class MainActivity extends AppCompatActivity {
                 representationIV
                         .setImageResource(R.drawable.snow);
                 break;
-            case "Mist":
-                break;
-            case "Smoke":
-                break;
-            case "Haze":
-                break;
-            case "Dust":
-                break;
-            case "Fog":
-                break;
-            case "Sand":
-                break;
-            case "Ash":
-                break;
-            case "Squall":
-                break;
+//            case "Mist":
+//                break;
+//            case "Smoke":
+//                break;
+//            case "Haze":
+//                break;
+//            case "Dust":
+//                break;
+//            case "Fog":
+//                break;
+//            case "Sand":
+//                break;
+//            case "Ash":
+//                break;
+//            case "Squall":
+//                break;
             case "Tornado":
+                representationIV
+                        .setImageResource(R.drawable.tornado);
                 break;
             case "Clear":
                 representationIV
@@ -474,7 +438,6 @@ public class MainActivity extends AppCompatActivity {
         weatherRV6 = findViewById(R.id.idRVWeather6);
         cityEdt = findViewById(R.id.idEdtCity);
         dayOfWeekTV = findViewById(R.id.dayOfWeekTV);
-
         iconIV = findViewById(R.id.idIVIcon);
         todayTV = findViewById(R.id.todayTV);
         tomTV = findViewById(R.id.tomTV);
@@ -482,12 +445,7 @@ public class MainActivity extends AppCompatActivity {
         todayTV4 = findViewById(R.id.todayTV4);
         todayTV5 = findViewById(R.id.todayTV5);
         todayTV6 = findViewById(R.id.todayTV6);
-
-
-
-
         dateTV = findViewById(R.id.dateTV);
-
         humidityTV = findViewById(R.id.humidityTV);
         representationIV = findViewById(R.id.representationIV);
         pressureTV = findViewById(R.id.pressureTV);
@@ -513,5 +471,29 @@ public class MainActivity extends AppCompatActivity {
         weatherRV5.setAdapter(weatherRVAdapter5);
         weatherRVAdapter6 = new WeatherRVAdapter6(this,weatherRVModalArrayList6);
         weatherRV6.setAdapter(weatherRVAdapter6);
+    }
+    private void searchCity() {
+        cityEdt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    String city = Objects.requireNonNull(cityEdt.getText()).toString();
+                    if(city.isEmpty()){
+                        Toast.makeText(MainActivity.this, "Please Enter City Name", Toast.LENGTH_SHORT).show();
+                    }else{
+                        cityNameTV.setText(city);
+                        String urlForecastByCityName = "https://api.openweathermap.org/data/2.5/forecast?q="
+                                + city +
+                                "&appid=caf89aee48527f1ef55a54cba7d2e51e&cnt=2" +
+                                "&units=metric";
+                        getWeather(urlForecastByCityName);
+                        splashCL.setVisibility(View.VISIBLE);
+                        SVMain.setVisibility(View.GONE);
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 }

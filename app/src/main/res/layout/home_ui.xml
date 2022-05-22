@@ -8,6 +8,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:visibility="gone">
+
         <LinearLayout
             android:id="@+id/LLMain"
             android:layout_width="match_parent"
@@ -334,7 +335,6 @@
                 android:text="@string/todayTV6"
                 android:visibility="gone"
                 android:textColor="@color/white"
-                android:textSize="18sp"
                 android:textStyle="bold" />
 
             <androidx.recyclerview.widget.RecyclerView
@@ -345,5 +345,8 @@
                 android:visibility="gone"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="20dp"/>
         </LinearLayout>
 </ScrollView>

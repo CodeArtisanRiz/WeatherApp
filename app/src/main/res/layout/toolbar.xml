@@ -1,33 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/idLLEdt"
-    android:orientation="horizontal"
-    android:background="@color/black_shade_1">
+    android:background="@color/black_shade_1"
+    android:fitsSystemWindows="true"
+    android:orientation="horizontal">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/idEdtCity"
-            android:background="@drawable/light_blue_square_rounded_shape_bg"
-            android:drawableStart="@drawable/ic_search"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:inputType="text"
-            android:layout_width="match_parent"
-            android:gravity="center_vertical"
-            android:imeOptions="actionSearch"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginTop="8dp"
-            android:textSize="16sp"
-            android:textColor="@color/color_black"
-            android:textColorHint="@color/color_gray"
-            android:hint="@string/search_city_weather" />
+                <Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="?attr/actionBarSize">
 
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/idEdtCity"
+                    android:background="@drawable/light_blue_square_rounded_shape_bg"
+                    android:drawableStart="@drawable/ic_search"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:inputType="text"
+                    android:layout_width="match_parent"
+                    android:gravity="center_vertical"
+                    android:imeOptions="actionSearch"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginTop="8dp"
+                    android:textSize="16sp"
+                    android:textColor="@color/color_black"
+                    android:textColorHint="@color/color_gray"
+                    android:hint="@string/search_city_weather" />
+
+                </Toolbar>
 
 
 </LinearLayout>
