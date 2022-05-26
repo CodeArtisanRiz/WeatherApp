@@ -34,7 +34,7 @@ Instructions on how to use them in your own application are linked below.
 | Volley | [https://github.com/google/volley/blob/master/README.md] |
 | Picasso | [https://github.com/square/picasso/blob/master/README.md] |
 
-## Screenhots
+## Screenshots
 
 
 
