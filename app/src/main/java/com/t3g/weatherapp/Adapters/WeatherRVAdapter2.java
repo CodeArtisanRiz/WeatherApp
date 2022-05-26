@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class WeatherRVAdapter2 extends RecyclerView.Adapter<WeatherRVAdapter2.ViewHolder> {
-    private Context context;
-    private ArrayList<WeatherRVModal> weatherRVModalArrayList2;
+    private final Context context;
+    private final ArrayList<WeatherRVModal> weatherRVModalArrayList2;
 
     public WeatherRVAdapter2(Context context, ArrayList<WeatherRVModal> weatherRVModalArrayList2) {
         this.context = context;
@@ -44,7 +44,9 @@ public class WeatherRVAdapter2 extends RecyclerView.Adapter<WeatherRVAdapter2.Vi
         holder.temperatureTv.setText(modal.getTemperature() + "°C");
         Picasso.get().load(modal.getIcon()).into(holder.conditionTV);
 //        holder.windTV.setText(modal.getWindSpeed() + "Km/hr");
+        @SuppressLint("SimpleDateFormat") 
         SimpleDateFormat input = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+        @SuppressLint("SimpleDateFormat")
         SimpleDateFormat output = new SimpleDateFormat("hh:mm aa");
         try {
             Date t = input.parse(modal.getTime());
